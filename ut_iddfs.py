@@ -72,21 +72,25 @@ class Test8Puzzle(unittest.TestCase):
         [self.topMiddle, None, None, self.rightMiddle])
 
   def testDFS(self):
-    fp = iddfs.DFS
-    self.assertEqual(fp(self.goal, self.goal, 0), (True, []))
-    self.assertEqual(fp(self.s0,   self.goal, 0), (False, []))
-    self.assertEqual(fp(self.s0,   self.goal, 1), (True, [0]))
-    self.assertEqual(fp(self.s3,   self.goal, 1), (True, [3]))
-    self.assertEqual(fp(self.s21,  self.goal, 2), (True, [2, 1][::-1]))
-    self.assertEqual(fp(self.s312, self.goal, 3), (True, [3, 1, 2][::-1]))
+    fp = iddfs.DLS
+    tr = iddfs.mapMoves
+    chk = lambda s: s == self.goal
+    self.assertEqual(fp(self.goal, chk, tr, 0), (True, []))
+    self.assertEqual(fp(self.s0,   chk, tr, 0), (False, []))
+    self.assertEqual(fp(self.s0,   chk, tr, 1), (True, [0]))
+    self.assertEqual(fp(self.s3,   chk, tr, 1), (True, [3]))
+    self.assertEqual(fp(self.s21,  chk, tr, 2), (True, [2, 1][::-1]))
+    self.assertEqual(fp(self.s312, chk, tr, 3), (True, [3, 1, 2][::-1]))
 
   def testIDDFS(self):
     fp = iddfs.iterDepthDFS
-    self.assertEqual(fp(self.goal, self.goal), (True, []))
-    self.assertEqual(fp(self.s0,   self.goal), (True, [0]))
-    self.assertEqual(fp(self.s3,   self.goal), (True, [3]))
-    self.assertEqual(fp(self.s21,  self.goal), (True, [2, 1][::-1]))
-    self.assertEqual(fp(self.s312, self.goal), (True, [3, 1, 2][::-1]))
+    tr = iddfs.mapMoves
+    chk = lambda s: s == self.goal
+    self.assertEqual(fp(self.goal, chk, tr), (True, []))
+    self.assertEqual(fp(self.s0,   chk, tr), (True, [0]))
+    self.assertEqual(fp(self.s3,   chk, tr), (True, [3]))
+    self.assertEqual(fp(self.s21,  chk, tr), (True, [2, 1][::-1]))
+    self.assertEqual(fp(self.s312, chk, tr), (True, [3, 1, 2][::-1]))
     goal = [1, 2, 3, 4,
            12,13,14, 5,
            11, 0,15, 6,
@@ -96,7 +100,8 @@ class Test8Puzzle(unittest.TestCase):
              11, 9, 3,15,
              10, 8,13, 7 ]
     moves = [3, 0, 3, 0, 2, 2, 1, 1, 2, 0, 3, 3]
-    self.assertEqual(fp(sample, goal), (True, moves))
+    chk2 = lambda s: s == goal
+    self.assertEqual(fp(sample, chk2, tr), (True, moves))
 
 def main():
   unittest.main()

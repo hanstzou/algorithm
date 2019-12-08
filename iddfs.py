@@ -1,12 +1,12 @@
 import math
 import pprint
 
-goal =  [1, 2, 3,
-         8, 0, 4,
-         7, 6, 5]
-sample =[1, 2, 3,
-         0, 6, 4,
-         8, 7, 5]
+p8goal =  [1, 2, 3,
+           8, 0, 4,
+           7, 6, 5]
+p8sample =[1, 2, 3,
+           0, 6, 4,
+           8, 7, 5]
 
 
 def countMoves(state):
@@ -62,35 +62,49 @@ def moveDown(state):
 def mapMoves(state):
   moveFuncs = [moveLeft, moveRight, moveUp, moveDown]
   return map(lambda fp: fp(state), moveFuncs)
+mapMoves.names = ['left', 'right', 'up', 'down']
 
 
-def DFS(state, goal, depth):
+
+# Iterative Deepening DFS
+
+def getChildren(state, transit):
+  # transit get all possible transitions
+  # (fills None for infeasible transits)
+  children = filter(lambda pair: pair[1] != None, enumerate(transit(state)))
+  return children
+
+
+def DLS(state, check_goal, transit, depth):
   if depth == 0:
-    return (state == goal, [])
+    return check_goal(state), []
   else:
-    children = filter(lambda pair: pair[1] != None,
-                    zip(range(4), mapMoves(state)))
+    children = getChildren(state, transit)
     for pair in children:
-      direction, child = pair
-      isFound, moves = DFS(child, goal, depth - 1)
+      transition, child = pair
+      isFound, transitions = DLS(child, check_goal, transit, depth - 1)
       if isFound:
-        moves += [direction]
-        return (isFound, moves)
+        transitions += [transition]
+        return (isFound, transitions)
   return (False, [])
 
 
-def iterDepthDFS(state, goal):
+def iterDepthDFS(state, check_goal, transit):
   for depth in range(0, 100):
-    isFound, moves = DFS(state, goal, depth)
+    isFound, transitions = DLS(state, check_goal, transit, depth)
     if isFound:
-      return (isFound, moves)
+      return (isFound, transitions)
 
+
+# main
 
 def main():
-  directions = ['left', 'right', 'up', 'down']
-  isFound, moves = iterDepthDFS(sample, goal)
+  transit = mapMoves
+  names = transit.names
+  isFound, transitions = iterDepthDFS(p8sample, lambda s: s == p8goal, transit)
   if isFound:
-    print(moves)
+    print(transitions)
+    pprint.pprint(list(map(lambda i: names[i], transitions)))
   pass
 
 
